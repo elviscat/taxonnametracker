@@ -1,0 +1,20 @@
+
+Select * FROM post WHERE preflv = 'genus' AND prefsid = '3'
+
+Update post SET pstate = '0' WHERE preflv = 'genus' AND prefsid = '3'
+Update post SET pstate = '0' WHERE preflv = '' AND prefsid = ''
+Update post SET pstate = '0' WHERE preflv = '' AND prefsid = ''
+Update post SET pstate = '0' WHERE preflv = '' AND prefsid = ''
+Update post SET pstate = '0' WHERE preflv = '' AND prefsid = ''
+
+
+sql_pid is SELECT pid FROM post WHERE preflv ='genus' AND prefsid ='3' AND pstate='0' AND pexpiration > '2010-01-22' Order By preflv and prefsid
+sql_pid is SELECT pid FROM post WHERE preflv ='species' AND prefsid ='10' AND pstate='0' AND pexpiration > '2010-01-22' Order By preflv and prefsid
+sql_pid is SELECT pid FROM post WHERE preflv ='species' AND prefsid ='12' AND pstate='0' AND pexpiration > '2010-01-22' Order By preflv and prefsid
+sql_pid is SELECT pid FROM post WHERE preflv ='genus' AND prefsid ='7' AND pstate='0' AND pexpiration > '2010-01-22' Order By preflv and prefsid
+Hello96 Level=preflv AND Taxon name=7
+sql_pid is SELECT pid FROM post WHERE preflv ='species' AND prefsid ='13' AND pstate='0' AND pexpiration > '2010-01-22' Order By preflv and prefsid
+sql_pid is SELECT pid FROM post WHERE preflv ='genus' AND prefsid ='5' AND pstate='0' AND pexpiration > '2010-01-22' Order By preflv and prefsid
+sql_pid is SELECT pid FROM post WHERE preflv ='species' AND prefsid ='1' AND pstate='0' AND pexpiration > '2010-01-22' Order By preflv and prefsid
+sql_pid is SELECT pid FROM post WHERE preflv ='species' AND prefsid ='17' AND pstate='0' AND pexpiration > '2010-01-22' Order By preflv and prefsid
+sql_pid is SELECT pid FROM post WHERE preflv ='species' AND prefsid ='18' AND pstate='0' AND pexpiration > '2010-01-22' Order By preflv and prefsid

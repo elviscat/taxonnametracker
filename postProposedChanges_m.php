@@ -1,0 +1,269 @@
+<?php 
+  //Developed by elviscat (elviscat@gmail.com)
+  //March 17, 2009 Tuesday:: post the proposed changes or suggestted name changes interface
+  //July 16, 2009 Thursday
+  //Dec 08, 2009 Tuesday:: modification and integration to main application
+  //Jan 13, 2010 Wednesday:: Testing
+  //Jan 26, 2010 Tuesday:: logic modification and add javascript to prevent null selection
+  //Mar 17, 2010 Wednesday:: add new upload module into this page
+  
+  // ./ current directory
+  // ../ up level directory
+
+  //template
+  session_start();
+  include('template/dbsetup.php'); 
+  require('inc/config.inc.php');
+  //Connect to database
+  $link = mysql_connect($host , $dbuser ,$dbpasswd); 
+  if (!$link) {
+    die('Could not connect: ' . mysql_error());
+  }
+  //select database
+  mysql_select_db($dbname);  
+
+  if( (!isset($_SESSION['is_login'])) ){
+	  Header("location:authorizedFail.php");
+	  exit();
+  }
+  if( (!isset($_SESSION['uid'])) ){
+	  Header("location:authorizedFail.php");
+	  exit();
+  }
+  if( $_SESSION['role'] == "admin" ){
+	  echo "System Administrator can not post proposed change!!";
+	  exit();
+  }
+
+  //Configuration of POST and GET Variables
+  $lv = htmlspecialchars($_GET['lv'],ENT_QUOTES);
+  //echo "Variable lv is :: ".$lv."<br>\n";
+  $id = htmlspecialchars($_GET['id'],ENT_QUOTES);
+  //echo "Variable id is :: ".$id."<br>\n";
+  
+  //$prefsid = $_GET['sid'];
+  $prefuid = $_SESSION['uid'];  
+  
+  //Configuration of POST and GET Variables
+
+  $selected_taxa = htmlspecialchars($_POST['selected_taxa'],ENT_QUOTES);
+  //echo "Variable selected_taxa is :: ".$selected_taxa."<br>\n";
+  if ( $selected_taxa == "" ){
+    echo "You need to select at least one taxon or some taxa!";
+    exit();
+  }    
+  $taxa_name = taxa_name($selected_taxa);
+  
+  $caption = $application_caption;
+  $caption2 = "Proposed Change of Taxon Name: Part of a Multi-taxon proposal<BR>\n";
+  $caption2 .= $taxa_name."<BR>\n";  
+  //$caption2 .= "Post your Proposed Changes or Suggestted Name Changes.";
+  $title = $application_caption."::".$caption2;
+  //template
+  
+ 
+?>
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+    <meta name="Description" content="Saint Louis University, tissue, species information" />
+    <meta name="Keywords" content="Saint Louis University, tissue, information" />
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <!--<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />-->
+    <meta name="Distribution" content="Global" />
+    <meta name="Author" content="Richard Mayden - cypriniformes@gmail.com, Elvis Hsin-Hui Wu - hwu5@slu.edu" />
+    <meta name="Robots" content="index,follow" />
+    <link rel="stylesheet" href="edit.css" type="text/css" /><!--Does this file edit.css should be keep?-->	
+    <!--<link rel="shortcut icon" type="image/ico" href="http://www.sprymedia.co.uk/media/images/favicon.ico" />-->
+		<title><? echo $title; ?></title>
+    <!--<script type="text/javascript" src="jquery/jquery-1.3.2.js"></script>-->
+    
+    <!-- jQuery library is required, see http://jquery.com/ -->
+    <script type="text/javascript" src="jquery/jquery.js"></script>
+    <!-- WYMeditor main JS file, minified version -->
+    <script type="text/javascript" src="wymeditor/jquery.wymeditor.js"></script>
+
+    <!--
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js" type="text/javascript"></script>
+    -->
+    
+    <!-- Required for jQuery dialog demo-->
+    <!--
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js" type="text/javascript"></script>
+    -->
+    <!--
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/ui-darkness/jquery-ui.css" type="text/css" media="all" />
+    -->
+    <!-- AJAX Upload script itself doesn't have any dependencies-->
+    
+    
+    <script type="text/javascript" src="jquery/ajaxupload.js"></script>
+
+
+	<style type="text/css" title="currentStyle">
+	  @import "media/css/demos.css";
+	</style> 
+
+<script type="text/javascript">
+/* Here we replace each element with class 'wymeditor'
+ * (typically textareas) by a WYMeditor instance.
+ * 
+ * We could use the 'html' option, to initialize the editor's content.
+ * If this option isn't set, the content is retrieved from
+ * the element being replaced.
+ */
+
+
+
+/*<![CDATA[*/
+$(document).ready(function(){
+  jQuery(function() {
+    jQuery('.wymeditor').wymeditor();
+  });
+
+	/* Example 1 */
+	var attachment = "";
+    var button = $('#button1'), interval;
+	new AjaxUpload(button, {
+		action: 'upload-handler.php', 
+		name: 'userfile',
+		onSubmit : function(file, ext){
+			// change button text, when user selects file			
+			button.text('Uploading');
+							
+			// If you want to allow uploading only 1 file at time,
+			// you can disable upload button
+			this.disable();
+			
+			// Uploding -> Uploading. -> Uploading...
+			interval = window.setInterval(function(){
+				var text = button.text();
+				if (text.length < 13){
+					button.text(text + '.');					
+				} else {
+					button.text('Uploading');				
+				}
+			}, 200);
+		},
+		onComplete: function(file, response){
+			//button.text('Upload');
+			button.html('<img src="images/attach.gif"/><u>Attach a file</u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Upload file size limitation up to 2MB)');			
+			window.clearInterval(interval);
+						
+			// enable upload button
+			this.enable();
+			// add file to the list
+			//$('<li></li>').appendTo('#example1 .files').text(file);	
+      //$('<li></li>').appendTo('#example1 .files').text(response);
+      //$('<li></li>').appendTo('#example1 .files').text('<a href=\"tw.yahoo.com\">123</a>');
+        
+      //var tt=$('<a/>').attr('href','http://tw.yahoo.com').attr('target','_blank').text('yahoo');
+      //tt.appendTo($('#message'));
+        
+      //$('<li></li>').appendTo('#example1 .message').text(tt);
+        
+      //$('<li></li>').appendTo('#example1 .files').text(response);
+      var response_array = response.split(";");        
+      attachment += response_array[0]+";";
+        
+      $('#attachment').val(attachment);
+      $('<li></li>').appendTo('#example1 .files').html("<a href=\"download.php?id=" + response_array[0] + "\">" + response_array[1] + "</a>");
+      //$('<li></li>').appendTo($('#message').html("<a href=\"download.php?id=" + response + "\">" + response + "</a>"));
+        						
+		}	
+		//
+	});
+	//attachment = attachment.substring(0,(attachment.length)-1);
+});/*]]>*/
+
+</script>		
+	</head>
+  <body id="dt_example">
+		<div id="container">	
+			<h1><? echo $caption; ?></h1>
+      <?php
+        include("menu.php");
+      ?>
+      <h2><?php echo $caption2; ?></h2>
+      <div id="demo">
+        <form id="postProposedChangesForm" action="postProposedChanges_m2.php" method="post">
+          <table>
+            <tr>
+              <td colspan=2><p>Please fill out your proposed change information</p></td>
+            </tr>
+            <tr>
+              <td ><label>Proposed change title</label></td>
+              <td ><input name="ptitle" id="ptitle" type="text" size="100" value="Your Proposed change title" /></td>
+            </tr>
+            <tr>
+              <td ><label>Proposed change type</label></td>
+              <td >
+                <select id="ptype" name="ptype">
+                  <option value="Proposed Changes" selected>Proposed Changes</option>
+                  <option value="Suggested Name Changes">Suggested Name Changes</option>
+                </select>
+                <input id="selected_taxa" name="selected_taxa" type="hidden" value="<?php echo $selected_taxa; ?>" />
+                <input id="prefuid" name="prefuid" type="hidden" value="<?php echo $prefuid; ?>" />
+              </td>
+            </tr>
+            <tr>
+              <td ><label>Proposed change content</label></td>
+              <!--<td ><textarea name="pcontent" rows="15" cols="25"></textarea></td>-->
+              <td >
+              	<textarea id="pcontent" name="pcontent" class="wymeditor">&lt;p&gt;Please post your proposed change here!&lt;/p&gt;</textarea>
+              </td>
+            </tr>
+            <tr>
+              <td colspan=2>
+                <!--<ul>-->
+	              <li id="example1" class="example">
+		            <!--<p>You can style button as you want</p>-->
+                    <div class="wrapper">	    
+                      <div id="button1" class="button"><img src="images/attach.gif"/><u>Attach a file</u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Upload file size limitation up to 2MB)</div>
+		            </div>
+		            <!--<p>Uploaded files:</p>-->
+		            <ol class="files"></ol>
+	              </li>
+                <!--</ul>-->
+                <input id="attachment" name="attachment" type="hidden" />
+              </td>
+            </tr>            
+            <tr>
+              <td colspan=2>
+              	<input type="submit" class="wymupdate" value="Post this proposed change" />
+              	<!--<button  name="post" id="post" type="submit" onclick="confirmation(); return false;">Post</button>-->
+              </td>
+            </tr>            
+            <!--
+            <tr>
+              <td colspan=2>Post your proposed change here!<br>2<img src=uploadedfiles/1247751256/kate1.jpg><br><a href=uploadedfiles/1247751256/339.gif>3</a><br>
+</td>
+            </tr>            
+            -->
+            
+            <!--
+            <tr>
+              <td colspan=2>
+                <p>
+                <a href="indexSpecies.php?sfamily=<? //echo $sfamily; ?>">Back to Species List</a>
+                </p>
+              </td>
+            </tr>
+            -->
+          </table>
+        </form>
+      </div>
+      <div id="msg"></div>
+      <div class="spacer"></div>
+			<div id="footer" style="text-align:center;">
+        <?php include("footer.htm"); ?>
+			</div>
+		</div>
+<?php
+  mysql_close($link); 
+?>
+  </body>
+</html>
+
+
